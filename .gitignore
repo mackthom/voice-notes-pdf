@@ -1,0 +1,9 @@
+node_modules/
+*.log
+.DS_Store
+desktop.ini
+Thumbs.db
+
+# Your own annotated readings — keep them off GitHub
+*.pdf
+!test.pdf

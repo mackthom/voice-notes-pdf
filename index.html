@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PDF Voice Notes</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='26'%3E%F0%9F%8E%99%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="toolbar">
+  <div class="brand">PDF&nbsp;Voice&nbsp;Notes</div>
+
+  <button id="openBtn" class="btn primary">Open PDF…</button>
+  <input id="fileInput" type="file" accept="application/pdf" hidden>
+
+  <span class="fileName" id="fileName">No file open</span>
+
+  <div class="spacer"></div>
+
+  <button id="placeBtn" class="btn" disabled title="Then click the spot on the page (N)">+ Add note</button>
+
+  <div class="zoom">
+    <button id="zoomOut" class="btn icon" disabled title="Zoom out">−</button>
+    <span id="zoomLabel">125%</span>
+    <button id="zoomIn" class="btn icon" disabled title="Zoom in">+</button>
+  </div>
+
+  <label class="pick" title="How the notes appear in the saved PDF">
+    Notes as
+    <select id="styleSelect">
+      <option value="margin">Margin text</option>
+      <option value="sticky">Sticky notes</option>
+      <option value="both">Both</option>
+    </select>
+  </label>
+
+  <label class="check" title="Adds a plain-text list of all your notes as extra pages at the end">
+    <input type="checkbox" id="summaryChk"> Summary pages
+  </label>
+
+  <button id="saveBtn" class="btn primary" disabled>Save annotated PDF…</button>
+  <button id="overwriteBtn" class="btn" disabled hidden title="Write straight back over the file you opened">Overwrite original</button>
+</header>
+
+<div id="hint" class="hint" hidden>Click the spot on the page where the note belongs. <kbd>Esc</kbd> to cancel.</div>
+
+<main class="layout">
+  <section id="viewerPane" class="viewerPane">
+    <div id="viewer" class="viewer"></div>
+
+    <div id="empty" class="empty">
+      <h1>Talk your notes onto a PDF.</h1>
+      <ol>
+        <li>Open a PDF.</li>
+        <li><b>Select a sentence.</b> It highlights, and a note opens beside it — or hit <b>+ Add note</b> and click anywhere on the page.</li>
+        <li>Press the <b>microphone</b> on the note and just talk.</li>
+        <li><b>Save annotated PDF</b> — the notes are printed into the page margin, visible without clicking anything.</li>
+      </ol>
+      <p class="fineprint">Your notes are saved <b>inside the PDF</b>, so reopening that file here brings them all back, still editable. Everything stays on this computer — the file is never uploaded anywhere.</p>
+    </div>
+  </section>
+
+  <aside class="rail">
+    <div class="railHead">
+      <h2>Notes <span id="noteCount" class="count">0</span></h2>
+      <select id="langSelect" class="lang" title="Dictation language">
+        <option value="en-US">English (US)</option>
+        <option value="en-GB">English (UK)</option>
+        <option value="es-ES">Español</option>
+        <option value="fr-FR">Français</option>
+        <option value="de-DE">Deutsch</option>
+        <option value="pt-BR">Português (BR)</option>
+      </select>
+    </div>
+    <label class="check small" title="Say &quot;period&quot;, &quot;comma&quot;, &quot;new line&quot; and they become punctuation">
+      <input type="checkbox" id="cmdChk" checked> Voice punctuation
+    </label>
+    <div id="micWarn" class="warn" hidden>
+      This browser has no built-in speech recognition. Use <b>Microsoft Edge</b> or <b>Chrome</b> to dictate; typing still works everywhere.
+    </div>
+    <div id="noteList" class="noteList"></div>
+    <p id="railEmpty" class="railEmpty">No notes yet.</p>
+  </aside>
+</main>
+
+<div id="toast" class="toast" hidden></div>
+
+<script src="vendor/pdf.min.js"></script>
+<script src="vendor/pdf-lib.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

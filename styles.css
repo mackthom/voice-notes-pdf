@@ -1,0 +1,238 @@
+:root {
+  --bg: #f2f1ee;
+  --panel: #ffffff;
+  --ink: #1c1b19;
+  --muted: #6c6a66;
+  --line: #dcdad4;
+  --accent: #b8552b;
+  --accent-soft: #f6e9e2;
+  --note: #f2c14e;
+  --rec: #d33a3a;
+  --shadow: 0 1px 2px rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.06);
+  --rail-w: 360px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #17181a; --panel: #212326; --ink: #e9e7e3; --muted: #9a9791;
+    --line: #34363a; --accent: #e2794a; --accent-soft: #33261f;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 15px/1.5 ui-sans-serif, -apple-system, "Segoe UI", Roboto, sans-serif;
+  display: flex; flex-direction: column;
+}
+
+/* ---------- toolbar ---------- */
+.toolbar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; background: var(--panel);
+  border-bottom: 1px solid var(--line); flex: 0 0 auto; flex-wrap: wrap;
+}
+.brand { font-weight: 650; letter-spacing: -.01em; margin-right: 4px; }
+.spacer { flex: 1 1 auto; }
+.fileName {
+  color: var(--muted); font-size: 13px; max-width: 28ch;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+.btn {
+  font: inherit; font-size: 13.5px; padding: 7px 13px; border-radius: 8px;
+  border: 1px solid var(--line); background: transparent; color: var(--ink);
+  cursor: pointer; transition: background .12s, border-color .12s;
+}
+.btn:hover:not(:disabled) { background: var(--accent-soft); border-color: var(--accent); }
+.btn:disabled { opacity: .4; cursor: default; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn.primary:hover:not(:disabled) { filter: brightness(1.07); }
+.btn.icon { padding: 6px 10px; font-size: 15px; line-height: 1; }
+.btn.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+.zoom { display: flex; align-items: center; gap: 6px; }
+.zoom span { font-size: 12.5px; color: var(--muted); min-width: 42px; text-align: center; }
+
+.pick { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
+.pick select {
+  font: inherit; font-size: 12.5px; padding: 5px 6px; border-radius: 7px;
+  border: 1px solid var(--line); background: transparent; color: var(--ink);
+}
+.check { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); cursor: pointer; }
+.check.small { font-size: 12.5px; padding: 0 14px 8px; }
+
+.hint {
+  padding: 7px 14px; background: var(--accent); color: #fff; font-size: 13px; flex: 0 0 auto;
+}
+.hint kbd {
+  background: rgba(255,255,255,.22); border-radius: 4px; padding: 1px 5px; font: inherit; font-size: 12px;
+}
+
+/* ---------- layout ---------- */
+.layout { flex: 1 1 auto; display: flex; min-height: 0; }
+
+.viewerPane { flex: 1 1 auto; overflow: auto; padding: 24px 0 80px; position: relative; }
+.viewer { display: flex; flex-direction: column; align-items: center; gap: 22px; }
+
+.rail {
+  flex: 0 0 var(--rail-w); width: var(--rail-w); background: var(--panel);
+  border-left: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0;
+}
+.railHead {
+  display: flex; align-items: center; gap: 8px; padding: 12px 14px 8px;
+}
+.railHead h2 { font-size: 14px; margin: 0; font-weight: 650; flex: 1 1 auto; }
+.count {
+  background: var(--accent-soft); color: var(--accent); border-radius: 20px;
+  padding: 1px 8px; font-size: 12px; font-weight: 600;
+}
+.lang {
+  font: inherit; font-size: 12px; padding: 4px 6px; border-radius: 7px;
+  border: 1px solid var(--line); background: transparent; color: var(--muted);
+}
+.noteList { overflow: auto; padding: 4px 12px 24px; display: flex; flex-direction: column; gap: 10px; }
+.railEmpty { color: var(--muted); font-size: 13px; padding: 0 16px; }
+.warn {
+  margin: 0 12px 10px; padding: 9px 11px; border-radius: 8px; font-size: 12.5px;
+  background: var(--accent-soft); color: var(--ink); border: 1px solid var(--line);
+}
+
+/* ---------- pages ---------- */
+/* .pageRow is the white sheet: page canvas on the left, margin column on the right.
+   That is exactly the shape the saved PDF page has, so this is what-you-see. */
+.pageBlock { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.pageLabel { font-size: 11.5px; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; }
+.pageRow {
+  display: flex; align-items: stretch; background: #fff;
+  box-shadow: var(--shadow); border-radius: 2px;
+}
+/* The shell is clipped to the content area. On a file this tool already widened,
+   the canvas is wider than the shell, so the baked gutter is hidden and the live
+   margin column sits exactly over it. */
+.page { position: relative; overflow: hidden; }
+.page canvas { display: block; position: relative; z-index: 0; }
+
+/* --- selectable text + highlights --- */
+.hlLayer { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+/* Translucent ink rather than mix-blend-mode: this layer has a z-index, which makes
+   it a stacking context, so a blend mode here would composite against the layer's own
+   transparent backdrop instead of the page underneath — i.e. paint solid over the
+   words. Alpha needs no backdrop and cannot be isolated.
+   Both values are picked so black text under them stays above 4.5:1 contrast
+   (5.7:1 resting, 7.0:1 when the note is selected). */
+.hl {
+  position: absolute; background: rgba(255, 222, 60, .42);
+  border-radius: 1px; transition: background .12s;
+}
+.hl.active { background: rgba(255, 196, 32, .38); }
+
+.textLayer {
+  position: absolute; top: 0; left: 0; z-index: 2; overflow: hidden;
+  line-height: 1; text-align: initial; forced-color-adjust: none;
+}
+.textLayer span, .textLayer br {
+  position: absolute; white-space: pre; cursor: text; transform-origin: 0% 0%;
+  color: transparent;
+}
+.textLayer ::selection { background: rgba(56, 118, 214, .3); }
+.textLayer .endOfContent { display: none; }
+
+
+
+.margin { position: relative; flex: 0 0 auto; display: none; }
+.viewer.showMargin .margin { display: block; }
+
+.mNote { position: absolute; transition: top .12s ease; }
+.mNote textarea {
+  display: block; width: 100%; border: 0; padding: 0; margin: 0; resize: none; overflow: hidden;
+  background: transparent; color: #1c52bf; font-family: Helvetica, Arial, sans-serif;
+  border-left: 2px solid transparent; padding-left: 5px; margin-left: -7px;
+}
+.mNote textarea::placeholder { color: #9aa6bd; }
+.mNote textarea:focus { outline: none; border-left-color: #1c52bf; }
+.mNote.active textarea { border-left-color: #9db6e8; }
+.mNote .interim { color: #7f93bb; padding-left: 5px; margin-left: -7px; }
+
+.mTools {
+  position: absolute; top: -2px; right: 100%; margin-right: 6px; display: flex; gap: 2px;
+  opacity: 0; transition: opacity .12s;
+}
+.mNote:hover .mTools, .mNote.active .mTools, .mTools:focus-within { opacity: 1; }
+.mic.tiny { width: 22px; height: 22px; background: #fff; }
+.mic.tiny svg { width: 12px; height: 12px; }
+.del.tiny { width: 20px; height: 20px; font-size: 13px; background: #fff; }
+.page.placing { cursor: crosshair; }
+.page.placing::after {
+  content: ""; position: absolute; inset: 0; outline: 2px dashed var(--accent); outline-offset: -2px;
+  pointer-events: none; z-index: 5;
+}
+/* While placing a note, clicks must reach the page, not the text layer. */
+.page.placing .textLayer { pointer-events: none; }
+
+.marker {
+  position: absolute; z-index: 4; width: 26px; height: 26px; margin: -13px 0 0 -13px;
+  border-radius: 50% 50% 50% 3px; background: var(--note); border: 1.5px solid rgba(0,0,0,.35);
+  display: grid; place-items: center; font-size: 11px; font-weight: 700; color: #3a2c07;
+  cursor: grab; box-shadow: 0 2px 6px rgba(0,0,0,.28); touch-action: none; user-select: none;
+}
+.marker:hover { transform: scale(1.12); }
+.marker.active { background: var(--accent); color: #fff; border-color: #fff; transform: scale(1.18); }
+.marker.dragging { cursor: grabbing; }
+
+/* ---------- note cards ---------- */
+.note {
+  border: 1px solid var(--line); border-radius: 10px; background: var(--bg);
+  padding: 9px 10px 10px; transition: border-color .12s, box-shadow .12s;
+}
+.note.active { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+.noteTop { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.noteIdx {
+  width: 20px; height: 20px; border-radius: 50%; background: var(--note); color: #3a2c07;
+  font-size: 11px; font-weight: 700; display: grid; place-items: center; flex: 0 0 auto;
+}
+.notePage { font-size: 12px; color: var(--muted); flex: 1 1 auto; cursor: pointer; }
+.notePage:hover { color: var(--accent); text-decoration: underline; }
+.note textarea {
+  width: 100%; min-height: 74px; resize: vertical; font: inherit; font-size: 13.5px;
+  border: 1px solid var(--line); border-radius: 7px; padding: 7px 8px;
+  background: var(--panel); color: var(--ink);
+}
+.note textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: transparent; }
+.interim { font-size: 12.5px; color: var(--muted); font-style: italic; min-height: 0; padding: 3px 2px 0; }
+
+.mic {
+  width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--line);
+  background: transparent; color: var(--ink); cursor: pointer; display: grid; place-items: center;
+  flex: 0 0 auto; padding: 0;
+}
+.mic:hover { border-color: var(--accent); color: var(--accent); }
+.mic svg { width: 15px; height: 15px; }
+.mic.rec { background: var(--rec); border-color: var(--rec); color: #fff; animation: pulse 1.3s ease-in-out infinite; }
+@keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(211,58,58,.55); } 50% { box-shadow: 0 0 0 7px rgba(211,58,58,0); } }
+.del {
+  width: 26px; height: 26px; border-radius: 6px; border: 1px solid transparent; background: transparent;
+  color: var(--muted); cursor: pointer; font-size: 15px; line-height: 1; padding: 0; flex: 0 0 auto;
+}
+.del:hover { color: var(--rec); border-color: var(--line); }
+
+/* ---------- empty state ---------- */
+.empty { max-width: 520px; margin: 8vh auto 0; padding: 0 24px; color: var(--muted); }
+.empty h1 { font-size: 26px; color: var(--ink); letter-spacing: -.02em; margin: 0 0 14px; }
+.empty ol { padding-left: 20px; }
+.empty li { margin-bottom: 7px; }
+.empty b { color: var(--ink); }
+.fineprint { font-size: 12.5px; margin-top: 20px; border-top: 1px solid var(--line); padding-top: 12px; }
+
+/* ---------- toast ---------- */
+.toast {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 9px;
+  font-size: 13.5px; box-shadow: var(--shadow); z-index: 50; max-width: 70ch;
+}
+
+@media (max-width: 900px) {
+  .layout { flex-direction: column; }
+  .rail { flex: 0 0 auto; width: 100%; border-left: 0; border-top: 1px solid var(--line); max-height: 45vh; }
+}
