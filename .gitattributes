@@ -1,0 +1,8 @@
+# Shell scripts must keep LF or they fail on macOS/Linux with "bad interpreter".
+# Windows batch files want CRLF.
+* text=auto eol=lf
+*.sh text eol=lf
+*.cmd text eol=crlf
+*.png binary
+*.pdf binary
+*.min.js -text
